@@ -2,7 +2,10 @@ package com.simpledb.file;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.RandomAccessFile;
+import java.lang.foreign.Arena;
+import java.lang.foreign.MemorySegment;
+import java.nio.channels.FileChannel;
+import java.nio.file.StandardOpenOption;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -10,11 +13,15 @@ public class FileMgr {
     private File dbDirectory;
     private int blocksize;
     private boolean isNew;
-    private Map<String, RandomAccessFile> openFiles = new HashMap<>();
+    private Map<String, MemorySegment> mappedFiles = new HashMap<>();
+    private final Arena arena;
+    private static final int INITIAL_BLOCKS = 100;
+    private static final int GROWTH_FACTOR = 2;
 
     public FileMgr(File dbDirectory, int blocksize) {
         this.dbDirectory = dbDirectory;
         this.blocksize = blocksize;
+        this.arena = Arena.ofShared();
 
         isNew = !dbDirectory.exists();
 
@@ -32,9 +39,10 @@ public class FileMgr {
 
     public synchronized void read(BlockId blk, Page p) {
         try {
-            RandomAccessFile f = getFile(blk.fileName());
-            f.seek(blk.number() * blocksize);
-            f.getChannel().read(p.contents());
+            MemorySegment mapped = getMappedFile(blk.fileName());
+            long offset = blk.number() * (long) blocksize;
+            MemorySegment blockSegment = mapped.asSlice(offset, blocksize);
+            MemorySegment.copy(blockSegment, 0, p.contents(), 0, blocksize);
         } catch (IOException e) {
             throw new RuntimeException("cannot read block " + blk);
         }
@@ -42,16 +50,20 @@ public class FileMgr {
 
     public synchronized void write(BlockId blk, Page p) {
         try {
-            RandomAccessFile f = getFile(blk.fileName());
+            MemorySegment mapped = getMappedFile(blk.fileName());
+            long offset = blk.number() * (long) blocksize;
+            long requiredLength = (blk.number() + 1) * (long) blocksize;
 
-            // Extend file if necessary
-            long requiredLength = (blk.number() + 1) * blocksize;
-            if (f.length() < requiredLength) {
-                f.setLength(requiredLength);
+            if (mapped.byteSize() < requiredLength) {
+                long currentBlocks = mapped.byteSize() / blocksize;
+                long newBlocks = Math.max(currentBlocks * GROWTH_FACTOR, blk.number() + 1);
+                long newSize = newBlocks * blocksize;
+                remapFile(blk.fileName(), newSize);
+                mapped = getMappedFile(blk.fileName());
             }
 
-            f.seek(blk.number() * blocksize);
-            f.getChannel().write(p.contents());
+            MemorySegment blockSegment = mapped.asSlice(offset, blocksize);
+            MemorySegment.copy(p.contents(), 0, blockSegment, 0, blocksize);
         } catch (IOException e) {
             throw new RuntimeException("cannot write block " + blk);
         }
@@ -60,24 +72,19 @@ public class FileMgr {
     public synchronized BlockId append(String filename) {
         int newblknum = length(filename);
         BlockId blk = new BlockId(filename, newblknum);
-        byte[] b = new byte[blocksize];
 
-        try {
-            RandomAccessFile f = getFile(blk.fileName());
-            f.seek(blk.number() * blocksize);
-            f.write(b);
-        } catch (IOException e) {
-            throw new RuntimeException("cannot append block " + blk);
-        }
+        Page emptyPage = new Page(blocksize, arena);
+        write(blk, emptyPage);
+
         return blk;
     }
 
     public int length(String filename) {
         try {
-            RandomAccessFile f = getFile(filename);
-            return (int) (f.length() / blocksize);
+            MemorySegment mapped = getMappedFile(filename);
+            return (int) (mapped.byteSize() / blocksize);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot access" + filename);
+            throw new RuntimeException("Cannot access " + filename);
         }
     }
 
@@ -89,14 +96,44 @@ public class FileMgr {
         return blocksize;
     }
 
-    private RandomAccessFile getFile(String filename) throws IOException {
-        RandomAccessFile f = openFiles.get(filename);
-        if (f == null) {
+    private MemorySegment getMappedFile(String filename) throws IOException {
+        MemorySegment mapped = mappedFiles.get(filename);
+        if (mapped == null) {
             File dbTable = new File(dbDirectory, filename);
-            f = new RandomAccessFile(dbTable, "rws");
-            openFiles.put(filename, f);
-        }
+            try (FileChannel channel = FileChannel.open(dbTable.toPath(),
+                    StandardOpenOption.CREATE,
+                    StandardOpenOption.READ,
+                    StandardOpenOption.WRITE)) {
 
-        return f;
+                long fileSize = channel.size();
+                long mapSize = fileSize > 0 ? fileSize : INITIAL_BLOCKS * (long) blocksize;
+
+                if (fileSize < mapSize) {
+                    channel.truncate(mapSize);
+                }
+
+                mapped = channel.map(FileChannel.MapMode.READ_WRITE, 0, mapSize, arena);
+                mappedFiles.put(filename, mapped);
+            }
+        }
+        return mapped;
+    }
+
+    private void remapFile(String filename, long newSize) throws IOException {
+        mappedFiles.remove(filename);
+        File dbTable = new File(dbDirectory, filename);
+
+        try (FileChannel channel = FileChannel.open(dbTable.toPath(),
+                StandardOpenOption.CREATE,
+                StandardOpenOption.READ,
+                StandardOpenOption.WRITE)) {
+
+            MemorySegment mapped = channel.map(FileChannel.MapMode.READ_WRITE, 0, newSize, arena);
+            mappedFiles.put(filename, mapped);
+        }
+    }
+
+    public Arena arena() {
+        return arena;
     }
 }

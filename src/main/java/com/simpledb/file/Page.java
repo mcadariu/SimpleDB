@@ -1,41 +1,46 @@
 package com.simpledb.file;
 
-import java.nio.ByteBuffer;
+import java.lang.foreign.*;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 
 public class Page {
-    private ByteBuffer bb;
+    private final MemorySegment segment;
+    private final Arena arena;
     public static final Charset CHARSET = StandardCharsets.US_ASCII;
 
-    public Page(int blocksize) {
-        bb = ByteBuffer.allocateDirect(blocksize);
+    private static final ValueLayout.OfInt INT_LAYOUT = ValueLayout.JAVA_INT.withByteAlignment(4);
+    private static final ValueLayout.OfByte BYTE_LAYOUT = ValueLayout.JAVA_BYTE;
+
+    public Page(int blocksize, Arena arena) {
+        this.arena = arena;
+        this.segment = arena.allocate(blocksize, 1);
     }
 
-    public Page(byte[] b) {
-        bb = ByteBuffer.wrap(b);
+    public Page(byte[] b, Arena arena) {
+        this.arena = arena;
+        this.segment = arena.allocate(b.length, 1);
+        MemorySegment.copy(b, 0, segment, BYTE_LAYOUT, 0, b.length);
     }
 
     public int getInt(int offset) {
-        return bb.getInt(offset);
+        return segment.get(INT_LAYOUT, offset);
     }
 
     public void setInt(int offset, int n) {
-        bb.putInt(offset, n);
+        segment.set(INT_LAYOUT, offset, n);
     }
 
     public byte[] getBytes(int offset) {
-        bb.position(offset);
-        int len = bb.getInt();
+        int len = segment.get(INT_LAYOUT, offset);
         byte[] b = new byte[len];
-        bb.get(b);
+        MemorySegment.copy(segment, BYTE_LAYOUT, offset + Integer.BYTES, b, 0, len);
         return b;
     }
 
     public void setBytes(int offset, byte[] b) {
-        bb.position(offset);
-        bb.putInt(b.length);
-        bb.put(b);
+        segment.set(INT_LAYOUT, offset, b.length);
+        MemorySegment.copy(b, 0, segment, BYTE_LAYOUT, offset + Integer.BYTES, b.length);
     }
 
     public String getString(int offset) {
@@ -53,8 +58,11 @@ public class Page {
         return Integer.BYTES + (strlen + (int) bytesPerChar);
     }
 
-    ByteBuffer contents() {
-        bb.position(0);
-        return bb;
+    MemorySegment contents() {
+        return segment;
+    }
+
+    Arena arena() {
+        return arena;
     }
 }

@@ -1,17 +1,16 @@
 package com.simpledb.file;
 
 import java.io.File;
-import java.io.IOException;
 
 public class FileMgrTest {
 
-    public static void main(String [] args) throws IOException {
+    public static void main(String [] args) {
         File tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
 
         FileMgr fileMgr = new FileMgr(tempDir, 400);
 
         BlockId blk = new BlockId("yolo", 2);
-        Page p1 = new Page(fileMgr.blockSize());
+        Page p1 = new Page(fileMgr.blockSize(), fileMgr.arena());
         int pos1 = 88;
         p1.setString(pos1, "abcyolo");
         int size = Page.maxLength("abcyolo".length());
@@ -20,7 +19,7 @@ public class FileMgrTest {
 
         fileMgr.write(blk, p1);
 
-        Page p2 = new Page(fileMgr.blockSize());
+        Page p2 = new Page(fileMgr.blockSize(), fileMgr.arena());
         fileMgr.read(blk, p2);
 
         System.out.println("offset " + pos1 + "contains" + p2.getString(pos1));
