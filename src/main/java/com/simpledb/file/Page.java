@@ -54,8 +54,9 @@ public class Page {
     }
 
     public static int maxLength(int strlen) {
-        float bytesPerChar = CHARSET.newDecoder().maxCharsPerByte();
-        return Integer.BYTES + (strlen + (int) bytesPerChar);
+        int bytesNeeded = Integer.BYTES + strlen;
+        // Round up to the next multiple of 4 to ensure proper alignment for subsequent int access
+        return (bytesNeeded + 3) & ~3;
     }
 
     MemorySegment contents() {
@@ -64,5 +65,15 @@ public class Page {
 
     Arena arena() {
         return arena;
+    }
+
+    public byte[] toByteArray() {
+        byte[] b = new byte[(int) segment.byteSize()];
+        MemorySegment.copy(segment, BYTE_LAYOUT, 0, b, 0, b.length);
+        return b;
+    }
+
+    public void clear() {
+        segment.fill((byte) 0);
     }
 }

@@ -15,8 +15,6 @@ public class FileMgr {
     private boolean isNew;
     private Map<String, MemorySegment> mappedFiles = new HashMap<>();
     private final Arena arena;
-    private static final int INITIAL_BLOCKS = 100;
-    private static final int GROWTH_FACTOR = 2;
 
     public FileMgr(File dbDirectory, int blocksize) {
         this.dbDirectory = dbDirectory;
@@ -54,11 +52,8 @@ public class FileMgr {
             long offset = blk.number() * (long) blocksize;
             long requiredLength = (blk.number() + 1) * (long) blocksize;
 
-            if (mapped.byteSize() < requiredLength) {
-                long currentBlocks = mapped.byteSize() / blocksize;
-                long newBlocks = Math.max(currentBlocks * GROWTH_FACTOR, blk.number() + 1);
-                long newSize = newBlocks * blocksize;
-                remapFile(blk.fileName(), newSize);
+            if (mapped == null || mapped.byteSize() < requiredLength) {
+                remapFile(blk.fileName(), requiredLength);
                 mapped = getMappedFile(blk.fileName());
             }
 
@@ -81,6 +76,10 @@ public class FileMgr {
 
     public int length(String filename) {
         try {
+            File dbTable = new File(dbDirectory, filename);
+            if (!dbTable.exists() || dbTable.length() == 0) {
+                return 0;
+            }
             MemorySegment mapped = getMappedFile(filename);
             return (int) (mapped.byteSize() / blocksize);
         } catch (IOException e) {
@@ -106,13 +105,11 @@ public class FileMgr {
                     StandardOpenOption.WRITE)) {
 
                 long fileSize = channel.size();
-                long mapSize = fileSize > 0 ? fileSize : INITIAL_BLOCKS * (long) blocksize;
-
-                if (fileSize < mapSize) {
-                    channel.truncate(mapSize);
+                if (fileSize == 0) {
+                    return null;
                 }
 
-                mapped = channel.map(FileChannel.MapMode.READ_WRITE, 0, mapSize, arena);
+                mapped = channel.map(FileChannel.MapMode.READ_WRITE, 0, fileSize, arena);
                 mappedFiles.put(filename, mapped);
             }
         }
@@ -128,6 +125,7 @@ public class FileMgr {
                 StandardOpenOption.READ,
                 StandardOpenOption.WRITE)) {
 
+            channel.truncate(newSize);
             MemorySegment mapped = channel.map(FileChannel.MapMode.READ_WRITE, 0, newSize, arena);
             mappedFiles.put(filename, mapped);
         }
