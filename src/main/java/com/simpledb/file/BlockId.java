@@ -16,4 +16,13 @@ public class BlockId {
     public int number() {
         return blknum;
     }
+
+    public String toString() {
+        return "[file " + filename + ", block" + blknum + "]";
+    }
+
+    public boolean equals(Object obj) {
+        BlockId blockId = (BlockId) obj;
+        return filename.equals(blockId.filename) && blknum == blockId.blknum;
+    }
 }

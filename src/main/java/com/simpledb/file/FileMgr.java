@@ -37,12 +37,20 @@ public class FileMgr {
     public synchronized void read(BlockId blk, Page p) {
         try {
             RandomAccessFile file = getFile(blk.fileName());
-            file.seek(blk.number() * (long) blocksize);
+            long offset = blk.number() * (long) blocksize;
+
+            // If the file is too short, just leave the page as zeros (don't read)
+            if (file.length() < offset + blocksize) {
+                p.clear();
+                return;
+            }
+
+            file.seek(offset);
             byte[] buffer = new byte[blocksize];
             file.readFully(buffer);
             java.lang.foreign.MemorySegment.copy(buffer, 0, p.contents(), ValueLayout.JAVA_BYTE, 0, blocksize);
         } catch (IOException e) {
-            throw new RuntimeException("cannot read block " + blk);
+            throw new RuntimeException("cannot read block " + blk, e);
         }
     }
 
