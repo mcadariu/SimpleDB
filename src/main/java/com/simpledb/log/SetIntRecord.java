@@ -7,33 +7,30 @@ import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
 import com.simpledb.transaction.Transaction;
 
-public class SetStringRecord implements LogRecord {
-    private int txnum, offset;
-    private String val;
+public class SetIntRecord implements LogRecord {
+    private int txnum, offset, val;
     private BlockId blockId;
 
-    public SetStringRecord(Page p) {
+    public SetIntRecord(Page p) {
         int tpos = Integer.BYTES;
         txnum = p.getInt(tpos);
 
         int fpos = tpos + Integer.BYTES;
-
         String filename = p.getString(fpos);
 
         int bpos = fpos + Page.maxLength(filename.length());
-
         int blknum = p.getInt(bpos);
 
         blockId = new BlockId(filename, blknum);
         int opos = bpos + Integer.BYTES;
         offset = p.getInt(opos);
         int vpos = opos + Integer.BYTES;
-        val = p.getString(vpos);
+        val = p.getInt(vpos);
     }
 
     @Override
     public int op() {
-        return SETSTRING;
+        return SETINT;
     }
 
     @Override
@@ -44,26 +41,25 @@ public class SetStringRecord implements LogRecord {
     @Override
     public void undo(Transaction tx) throws BufferAbortException, LockAbortException {
         tx.pin(blockId);
-        tx.setString(blockId, offset, val, false);
+        tx.setInt(blockId, offset, val, false);
         tx.unpin(blockId);
     }
 
-    public static int writeToLog(LogMgr lm, int txnum, BlockId blockId, int offset, String val, FileMgr fileMgr) {
-
+    public static int writeToLog(LogMgr lm, int txnum, BlockId blockId, int offset, int val, FileMgr fileMgr) {
         int tpos = Integer.BYTES;
         int fpos = tpos + Integer.BYTES;
         int bpos = fpos + Page.maxLength(blockId.fileName().length());
         int opos = bpos + Integer.BYTES;
         int vpos = opos + Integer.BYTES;
-        int reclen = vpos + Page.maxLength(val.length());
+        int reclen = vpos + Integer.BYTES;
         Page p = new Page(reclen, fileMgr.arena());
 
-        p.setInt(0, SETSTRING);
+        p.setInt(0, SETINT);
         p.setInt(tpos, txnum);
         p.setString(fpos, blockId.fileName());
         p.setInt(bpos, blockId.number());
         p.setInt(opos, offset);
-        p.setString(vpos, val);
+        p.setInt(vpos, val);
         return lm.append(p.toByteArray());
     }
 }

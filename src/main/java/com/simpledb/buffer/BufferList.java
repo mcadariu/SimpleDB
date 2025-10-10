@@ -16,26 +16,26 @@ public class BufferList {
         this.bufferMgr = bufferMgr;
     }
 
-    Buffer getBuffer(BlockId blockId) {
+    public Buffer getBuffer(BlockId blockId) {
         return buffers.get(blockId);
     }
 
-    void pin(BlockId blockId) throws BufferAbortException {
+    public void pin(BlockId blockId) throws BufferAbortException {
         Buffer buff = bufferMgr.pin(blockId);
         buffers.put(blockId, buff);
         pins.add(blockId);
     }
 
-    void unpin(BlockId blockId) {
+    public void unpin(BlockId blockId) {
         Buffer buffer = buffers.get(blockId);
         bufferMgr.unpin(buffer);
         pins.remove(blockId);
-        if(!pins.contains(blockId))
+        if (!pins.contains(blockId))
             buffers.remove(blockId);
     }
 
-    void unpinAll() {
-        for(BlockId blockId: pins) {
+    public void unpinAll() {
+        for (BlockId blockId : pins) {
             Buffer buff = buffers.get(blockId);
             bufferMgr.unpin(buff);
         }

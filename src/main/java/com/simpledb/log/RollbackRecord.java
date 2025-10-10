@@ -4,17 +4,19 @@ import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
 import com.simpledb.transaction.Transaction;
 
-public class StartRecord implements LogRecord {
+import java.io.File;
+
+public class RollbackRecord implements LogRecord {
     private int txnum;
 
-    public StartRecord(Page p) {
+    public RollbackRecord(Page p) {
         int tpos = Integer.BYTES;
         txnum = p.getInt(tpos);
     }
 
     @Override
     public int op() {
-        return START;
+        return ROLLBACK;
     }
 
     @Override
@@ -29,7 +31,7 @@ public class StartRecord implements LogRecord {
 
     public static int writeToLog(LogMgr lm, int txnum, FileMgr fileMgr) {
         Page p = new Page(2 * Integer.BYTES, fileMgr.arena());
-        p.setInt(0, START);
+        p.setInt(0, ROLLBACK);
         p.setInt(Integer.BYTES, txnum);
         return lm.append(p.toByteArray());
     }

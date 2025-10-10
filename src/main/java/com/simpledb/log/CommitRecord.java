@@ -4,17 +4,17 @@ import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
 import com.simpledb.transaction.Transaction;
 
-public class StartRecord implements LogRecord {
+public class CommitRecord implements LogRecord {
     private int txnum;
 
-    public StartRecord(Page p) {
+    public CommitRecord(Page p) {
         int tpos = Integer.BYTES;
         txnum = p.getInt(tpos);
     }
 
     @Override
     public int op() {
-        return START;
+        return COMMIT;
     }
 
     @Override
@@ -29,7 +29,7 @@ public class StartRecord implements LogRecord {
 
     public static int writeToLog(LogMgr lm, int txnum, FileMgr fileMgr) {
         Page p = new Page(2 * Integer.BYTES, fileMgr.arena());
-        p.setInt(0, START);
+        p.setInt(0, COMMIT);
         p.setInt(Integer.BYTES, txnum);
         return lm.append(p.toByteArray());
     }
