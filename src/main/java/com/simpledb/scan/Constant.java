@@ -1,13 +1,42 @@
 package com.simpledb.scan;
 
-public interface Constant {
-    Object asJavaVal();
+public class Constant implements Comparable<Constant> {
 
-    boolean equals(Object obj);
+    private Integer ival = null;
+    private String sval = null;
 
-    int hashCode();
+    public Constant(Integer ival) {
+        this.ival = ival;
+    }
 
-    String toString();
+    public Constant(String sval) {
+        this.sval = sval;
+    }
 
-    int compareTo(Constant other);
+    public int asInt() {
+        return ival;
+    }
+
+    public String asString() {
+        return sval;
+    }
+
+    public boolean equals(Object obj) {
+        Constant c = (Constant) obj;
+        return (ival != null) ? ival.equals(c.ival) : sval.equals(c.sval);
+    }
+
+    @Override
+    public int compareTo(Constant c) {
+
+        return (ival != null) ? ival.compareTo(c.ival) : sval.compareTo(c.sval);
+    }
+
+    public int hashCode() {
+        return (ival != null) ? ival.hashCode() : sval.hashCode();
+    }
+
+    public String toString() {
+        return (ival != null) ? ival.toString() : sval;
+    }
 }
