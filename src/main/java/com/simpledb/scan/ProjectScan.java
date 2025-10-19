@@ -1,5 +1,8 @@
 package com.simpledb.scan;
 
+import com.simpledb.buffer.BufferAbortException;
+import com.simpledb.concurrency.LockAbortException;
+
 import java.util.Collection;
 import java.util.List;
 
@@ -14,32 +17,31 @@ public class ProjectScan implements Scan {
     }
 
     @Override
-    public void beforeFirst() {
+    public void beforeFirst() throws BufferAbortException, LockAbortException {
         s.beforeFirst();
-        ;
     }
 
     @Override
-    public boolean next() {
-        return false;
+    public boolean next() throws BufferAbortException, LockAbortException {
+        return s.next();
     }
 
     @Override
-    public int getInt(String fldname) {
+    public int getInt(String fldname) throws LockAbortException {
         if (hasField(fldname))
             return s.getInt(fldname);
         else throw new RuntimeException("field not found.");
     }
 
     @Override
-    public String getString(String fldname) {
+    public String getString(String fldname) throws LockAbortException {
         if (hasField(fldname))
             return s.getString(fldname);
         else throw new RuntimeException("field not found.");
     }
 
     @Override
-    public Constant getVal(String fldname) {
+    public Constant getVal(String fldname) throws LockAbortException {
         if (hasField(fldname))
             return s.getVal(fldname);
         else throw new RuntimeException("field not found.");

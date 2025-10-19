@@ -22,7 +22,7 @@ public class MetadataMgrTest {
         schema.addStringField("B", 9);
 
         metadataMgr.createTable("MyTable", schema, tx);
-        Layout layout = metadataMgr.getLayout("MyTable", schema, tx);
+        Layout layout = metadataMgr.getLayout("MyTable", tx);
 
         int size = layout.slotsize();
         Schema schema2 = layout.schema();

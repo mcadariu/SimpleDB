@@ -1,5 +1,7 @@
 package com.simpledb.scan;
 
+import com.simpledb.concurrency.LockAbortException;
+import com.simpledb.planning.Plan;
 import com.simpledb.record.Schema;
 
 import java.util.ArrayList;
@@ -20,7 +22,7 @@ public class Predicate {
         terms.addAll(pred.terms);
     }
 
-    public boolean isSatisfied(Scan s) {
+    public boolean isSatisfied(Scan s) throws LockAbortException {
         for (Term t : terms)
             if (!t.isSatisfied(s))
                 return false;

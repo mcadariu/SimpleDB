@@ -23,7 +23,7 @@ public class MetadataMgr {
         tableMgr.createTable(tblname, schema, tx);
     }
 
-    public Layout getLayout(String tblname, Schema schema, Transaction tx) throws BufferAbortException, LockAbortException {
+    public Layout getLayout(String tblname, Transaction tx) throws BufferAbortException, LockAbortException {
         return tableMgr.getLayout(tblname, tx);
     }
 

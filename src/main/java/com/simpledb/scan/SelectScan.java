@@ -1,6 +1,9 @@
 package com.simpledb.scan;
 
-public class SelectScan {
+import com.simpledb.buffer.BufferAbortException;
+import com.simpledb.concurrency.LockAbortException;
+
+public class SelectScan implements Scan {
     private Scan s;
     private Predicate pred;
 
@@ -9,26 +12,26 @@ public class SelectScan {
         this.pred = pred;
     }
 
-    public void beforeFirst() {
+    public void beforeFirst() throws BufferAbortException, LockAbortException {
         s.beforeFirst();
     }
 
-    public boolean next() {
+    public boolean next() throws BufferAbortException, LockAbortException {
         while (s.next())
             if (pred.isSatisfied(s))
                 return true;
         return false;
     }
 
-    public int getInt(String fldname) {
+    public int getInt(String fldname) throws LockAbortException {
         return s.getInt(fldname);
     }
 
-    public String getString(String fldname) {
+    public String getString(String fldname) throws LockAbortException {
         return s.getString(fldname);
     }
 
-    public Constant getVal(String fldname) {
+    public Constant getVal(String fldname) throws LockAbortException {
         return s.getVal(fldname);
     }
 

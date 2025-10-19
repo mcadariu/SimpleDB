@@ -2,6 +2,8 @@ package com.simpledb.parsing;
 
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Constant;
+import com.simpledb.scan.IntConstant;
+import com.simpledb.scan.StringConstant;
 import com.simpledb.scan.Expression;
 import com.simpledb.scan.Predicate;
 import com.simpledb.scan.Term;
@@ -23,9 +25,9 @@ public class Parser {
 
     public Constant constant() throws BadSyntaxException {
         if (lex.matchStringConstant())
-            return new Constant(lex.eatStringConstant());
+            return new StringConstant(lex.eatStringConstant());
         else
-            return new Constant(lex.eatIntConstant());
+            return new IntConstant(lex.eatIntConstant());
     }
 
     public Expression expression() throws BadSyntaxException {
