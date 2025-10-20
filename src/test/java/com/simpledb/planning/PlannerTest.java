@@ -55,7 +55,6 @@ public class PlannerTest {
         ts.setInt("sid", 1);
         ts.setString("sname", "Alice");
         ts.setInt("gradyear", 2024);
-        ts.setInt("majorid", 10);
 
         // Insert student 2
         ts.insert();
