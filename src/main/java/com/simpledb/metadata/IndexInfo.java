@@ -1,5 +1,7 @@
 package com.simpledb.metadata;
 
+import com.simpledb.indexing.HashIndex;
+import com.simpledb.indexing.Index;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.transaction.Transaction;
@@ -23,11 +25,13 @@ public class IndexInfo {
     }
 
     public int blocksAccessed() {
-        return 42;
+        int rpb = tx.blockSize();
+        int numblocks = statInfo.recordsOutput() / rpb;
+        return HashIndex.searchCost(numblocks, rpb);
     }
 
     public int recordsOutput() {
-        return statInfo.recordsOutput();
+        return statInfo.recordsOutput() / statInfo.distinctValues(fldname);
     }
 
     public int distinctValues(String fname) {
@@ -46,6 +50,11 @@ public class IndexInfo {
         }
 
         return new Layout(schema);
+    }
+
+    public Index open() {
+        Schema sch = tblSchema;
+        return new HashIndex(tx, idxname, idxLayout);
     }
 
 }

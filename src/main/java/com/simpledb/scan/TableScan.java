@@ -9,7 +9,7 @@ import com.simpledb.transaction.Transaction;
 
 import java.sql.Types;
 
-public class TableScan implements Scan {
+public class TableScan implements UpdateScan {
     private Transaction transaction;
     private Layout layout;
     private RecordPage recordPage;
@@ -76,11 +76,11 @@ public class TableScan implements Scan {
         recordPage.setString(currentslot, fldname, val);
     }
 
-//    public void setVal(String fldname, Constant val) throws LockAbortException {
-//        if (layout.schema().type(fldname) == Types.INTEGER)
-//            setInt(fldname, (Integer) val.asJavaVal());
-//        else setString(fldname, (String) val.asJavaVal());
-//    }
+    public void setVal(String fldname, Constant val) throws LockAbortException {
+        if (layout.schema().type(fldname) == Types.INTEGER)
+            setInt(fldname, (Integer) val.asJavaVal());
+        else setString(fldname, (String) val.asJavaVal());
+    }
 
     public void insert() throws LockAbortException, BufferAbortException {
         currentslot = recordPage.insertAfter(currentslot);
