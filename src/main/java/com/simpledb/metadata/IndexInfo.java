@@ -1,7 +1,7 @@
 package com.simpledb.metadata;
 
-import com.simpledb.indexing.HashIndex;
-import com.simpledb.indexing.Index;
+import com.simpledb.index.HashIndex;
+import com.simpledb.index.Index;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.transaction.Transaction;

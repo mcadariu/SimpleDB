@@ -1,4 +1,4 @@
-package com.simpledb.planning;
+package com.simpledb.plan;
 
 import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.concurrency.LockAbortException;

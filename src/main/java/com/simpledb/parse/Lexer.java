@@ -1,4 +1,4 @@
-package com.simpledb.parsing;
+package com.simpledb.parse;
 
 import java.io.IOException;
 import java.io.StreamTokenizer;

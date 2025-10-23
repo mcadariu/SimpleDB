@@ -1,4 +1,4 @@
-package com.simpledb.indexing;
+package com.simpledb.index;
 
 import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.concurrency.LockAbortException;

@@ -1,4 +1,4 @@
-package com.simpledb.parsing;
+package com.simpledb.parse;
 
 public class PredParser {
     private Lexer lex;

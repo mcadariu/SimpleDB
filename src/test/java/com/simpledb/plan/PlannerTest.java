@@ -1,10 +1,10 @@
-package com.simpledb.planning;
+package com.simpledb.plan;
 
 import com.simpledb.SimpleDB;
 import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.concurrency.LockAbortException;
-import com.simpledb.parsing.BadSyntaxException;
-import com.simpledb.parsing.Parser;
+import com.simpledb.parse.BadSyntaxException;
+import com.simpledb.parse.Parser;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Scan;

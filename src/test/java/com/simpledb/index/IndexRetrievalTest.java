@@ -1,12 +1,12 @@
-package com.simpledb.indexing;
+package com.simpledb.index;
 
 import com.simpledb.SimpleDB;
 import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.IndexInfo;
 import com.simpledb.metadata.MetadataMgr;
-import com.simpledb.planning.Plan;
-import com.simpledb.planning.TablePlan;
+import com.simpledb.plan.Plan;
+import com.simpledb.plan.TablePlan;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Constant;
 import com.simpledb.scan.IntConstant;

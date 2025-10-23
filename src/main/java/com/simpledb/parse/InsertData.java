@@ -1,4 +1,4 @@
-package com.simpledb.parsing;
+package com.simpledb.parse;
 
 import com.simpledb.scan.Constant;
 

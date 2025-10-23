@@ -1,7 +1,7 @@
 package com.simpledb.scan;
 
 import com.simpledb.concurrency.LockAbortException;
-import com.simpledb.planning.Plan;
+import com.simpledb.plan.Plan;
 import com.simpledb.record.Schema;
 
 public class Term {
