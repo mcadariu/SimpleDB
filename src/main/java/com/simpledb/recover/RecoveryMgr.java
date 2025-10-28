@@ -1,4 +1,4 @@
-package com.simpledb.recovery;
+package com.simpledb.recover;
 
 import com.simpledb.buffer.Buffer;
 import com.simpledb.buffer.BufferAbortException;

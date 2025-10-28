@@ -10,7 +10,7 @@ import com.simpledb.scan.IndexSelectScan;
 import com.simpledb.scan.Scan;
 import com.simpledb.scan.TableScan;
 
-public class IndexSelectPlan {
+public class IndexSelectPlan implements Plan {
     private Plan p;
     private IndexInfo ii;
     private Constant val;
@@ -31,7 +31,7 @@ public class IndexSelectPlan {
         return ii.blocksAccessed() + recordsOutput();
     }
 
-    private int recordsOutput() {
+    public int recordsOutput() {
         return ii.recordsOutput();
     }
 

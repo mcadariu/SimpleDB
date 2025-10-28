@@ -82,4 +82,8 @@ public class Predicate {
             result.append(" and ").append(iter.next().toString());
         return result.toString();
     }
+
+    public Predicate selectSubPred(Schema myschema) {
+        return null;
+    }
 }
