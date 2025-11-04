@@ -11,20 +11,20 @@ import com.simpledb.scan.IntConstant;
 import com.simpledb.scan.RID;
 import com.simpledb.scan.UpdateScan;
 import com.simpledb.transaction.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class IndexRetrievalTest {
     private SimpleDB simpleDB;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         simpleDB = new SimpleDB(400, 8);
     }

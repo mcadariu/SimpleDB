@@ -5,18 +5,18 @@ import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.TableScan;
 import com.simpledb.transaction.Transaction;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.sql.Types;
 import java.util.Map;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class MetadataMgrTest {
     private SimpleDB simpleDB;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         simpleDB = new SimpleDB(400, 8);
     }

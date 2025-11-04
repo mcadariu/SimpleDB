@@ -2,22 +2,22 @@ package com.simpledb.file;
 
 import java.io.File;
 
-import static org.junit.Assert.*;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 public class FileMgrTest {
     private File tempDir;
     private FileMgr fileMgr;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
         fileMgr = new FileMgr(tempDir, 400);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (tempDir != null && tempDir.exists()) {
             deleteDirectory(tempDir);

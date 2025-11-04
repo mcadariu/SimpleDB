@@ -2,30 +2,30 @@ package com.simpledb.log;
 
 import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
 public class LogTest {
     private LogMgr logMgr;
     private FileMgr fileMgr;
     private File tempDir;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
         fileMgr = new FileMgr(tempDir, 400);
         logMgr = new LogMgr(fileMgr, "logtest");
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (tempDir != null && tempDir.exists()) {
             deleteDirectory(tempDir);

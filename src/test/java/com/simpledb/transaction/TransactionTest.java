@@ -4,13 +4,13 @@ import com.simpledb.buffer.BufferMgr;
 import com.simpledb.file.BlockId;
 import com.simpledb.file.FileMgr;
 import com.simpledb.log.LogMgr;
-import org.junit.After;
-import org.junit.Before;
-import org.junit.Test;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.io.File;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 public class TransactionTest {
     private FileMgr fileMgr;
@@ -18,7 +18,7 @@ public class TransactionTest {
     private BufferMgr bufferMgr;
     private File tempDir;
 
-    @Before
+    @BeforeEach
     public void setUp() {
         tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
         fileMgr = new FileMgr(tempDir, 400);
@@ -26,7 +26,7 @@ public class TransactionTest {
         bufferMgr = new BufferMgr(fileMgr, logMgr, 3);
     }
 
-    @After
+    @AfterEach
     public void tearDown() {
         if (tempDir != null && tempDir.exists()) {
             deleteDirectory(tempDir);
