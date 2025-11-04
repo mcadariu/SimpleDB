@@ -1,7 +1,5 @@
 package com.simpledb.scan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.plan.AggregationFn;
 
 import java.util.List;
@@ -13,7 +11,7 @@ public class GroupByScan implements Scan {
     private GroupValue groupVal;
     private boolean moregroups;
 
-    public GroupByScan(Scan s, List<String> groupByFields, List<AggregationFn> aggregationFns) throws BufferAbortException, LockAbortException {
+    public GroupByScan(Scan s, List<String> groupByFields, List<AggregationFn> aggregationFns) {
         this.s = s;
         this.groupByFields = groupByFields;
         this.aggfns = aggregationFns;
@@ -22,13 +20,13 @@ public class GroupByScan implements Scan {
 
 
     @Override
-    public void beforeFirst() throws BufferAbortException, LockAbortException {
+    public void beforeFirst() {
         s.beforeFirst();
         moregroups = s.next();
     }
 
     @Override
-    public boolean next() throws LockAbortException, BufferAbortException {
+    public boolean next() {
         if (!moregroups)
             return false;
         for (AggregationFn fn : aggfns)
@@ -46,17 +44,17 @@ public class GroupByScan implements Scan {
     }
 
     @Override
-    public int getInt(String fldname) throws LockAbortException {
+    public int getInt(String fldname) {
         return getVal(fldname).asInt();
     }
 
     @Override
-    public String getString(String fldname) throws LockAbortException {
+    public String getString(String fldname) {
         return getVal(fldname).asString();
     }
 
     @Override
-    public Constant getVal(String fldname) throws LockAbortException {
+    public Constant getVal(String fldname) {
         if (groupByFields.contains(fldname))
             return groupVal.getVal(fldname);
         for (AggregationFn fn : aggfns)

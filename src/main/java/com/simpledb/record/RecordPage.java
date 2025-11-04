@@ -1,7 +1,5 @@
 package com.simpledb.record;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.BlockId;
 import com.simpledb.transaction.Transaction;
 
@@ -13,38 +11,38 @@ public class RecordPage {
     private BlockId blk;
     private Layout layout;
 
-    public RecordPage(Transaction tx, BlockId blockId, Layout layout) throws BufferAbortException {
+    public RecordPage(Transaction tx, BlockId blockId, Layout layout) {
         this.tx = tx;
         this.blk = blockId;
         this.layout = layout;
         tx.pin(blockId);
     }
 
-    public int getInt(int slot, String fldname) throws LockAbortException {
+    public int getInt(int slot, String fldname) {
         int fldpos = offset(slot) + layout.offset(fldname);
         return tx.getInt(blk, fldpos);
     }
 
-    public String getString(int slot, String fldname) throws LockAbortException {
+    public String getString(int slot, String fldname) {
         int fldpos = offset(slot) + layout.offset(fldname);
         return tx.getString(blk, fldpos);
     }
 
-    public void setInt(int slot, String fldname, int val) throws LockAbortException {
+    public void setInt(int slot, String fldname, int val) {
         int fldpos = offset(slot) + layout.offset(fldname);
         tx.setInt(blk, fldpos, val, true);
     }
 
-    public void setString(int slot, String fldname, String val) throws LockAbortException {
+    public void setString(int slot, String fldname, String val) {
         int fldpos = offset(slot) + layout.offset(fldname);
         tx.setString(blk, fldpos, val, true);
     }
 
-    public void delete(int slot) throws LockAbortException {
+    public void delete(int slot) {
         setFlag(slot, EMPTY);
     }
 
-    public void format() throws LockAbortException {
+    public void format() {
         int slot = 0;
         while (isValidSlot(slot)) {
             tx.setInt(blk, offset(slot), EMPTY, false);
@@ -60,18 +58,18 @@ public class RecordPage {
         }
     }
 
-    public int nextAfter(int slot) throws LockAbortException {
+    public int nextAfter(int slot) {
         return searchAfter(slot, USED);
     }
 
-    public int insertAfter(int slot) throws LockAbortException {
+    public int insertAfter(int slot) {
         int newslot = searchAfter(slot, EMPTY);
         if (newslot >= 0)
             setFlag(newslot, USED);
         return newslot;
     }
 
-    private int searchAfter(int slot, int flag) throws LockAbortException {
+    private int searchAfter(int slot, int flag) {
         slot++;
         while (isValidSlot(slot)) {
             if (tx.getInt(blk, offset(slot)) == flag)
@@ -90,7 +88,7 @@ public class RecordPage {
         return offset(slot + 1) <= tx.blockSize();
     }
 
-    private void setFlag(int slot, int flag) throws LockAbortException {
+    private void setFlag(int slot, int flag) {
         tx.setInt(blk, offset(slot), flag, true);
     }
 

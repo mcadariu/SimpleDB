@@ -1,19 +1,30 @@
 package com.simpledb.plan;
 
 import com.simpledb.SimpleDB;
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
-import com.simpledb.parse.BadSyntaxException;
 import com.simpledb.parse.Parser;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Scan;
 import com.simpledb.scan.TableScan;
 import com.simpledb.transaction.Transaction;
+import org.junit.Before;
+import org.junit.Test;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.*;
 
 public class PlannerTest {
-    public static void main(String[] args) throws BufferAbortException, LockAbortException, BadSyntaxException {
-        SimpleDB simpleDB = new SimpleDB(400, 8);
+    private SimpleDB simpleDB;
+
+    @Before
+    public void setUp() {
+        simpleDB = new SimpleDB(400, 8);
+    }
+
+    @Test
+    public void testBasicQueryPlanner() {
         Transaction tx = simpleDB.newTransaction();
 
         // Create and populate the student table
@@ -25,17 +36,39 @@ public class PlannerTest {
         Parser parser = new Parser(qry);
         Plan p = basicQueryPlanner.createPlan(parser.query(), tx);
 
-        System.out.println("Query results:");
+        assertNotNull(p);
+
+        List<StudentRecord> results = new ArrayList<>();
         Scan s = p.open();
         while (s.next()) {
-            System.out.println(s.getString("sname") + " " + s.getInt("gradyear"));
+            String sname = s.getString("sname");
+            int gradyear = s.getInt("gradyear");
+            results.add(new StudentRecord(sname, gradyear));
         }
         s.close();
+
+        // Verify we got 5 students
+        assertEquals(5, results.size());
+
+        // Verify some expected data
+        boolean foundAlice = false;
+        boolean foundBob = false;
+        for (StudentRecord record : results) {
+            if ("Alice".equals(record.sname)) {
+                foundAlice = true;
+                assertEquals(2024, record.gradyear);
+            } else if ("Bob".equals(record.sname)) {
+                foundBob = true;
+                assertEquals(2025, record.gradyear);
+            }
+        }
+        assertTrue(foundAlice);
+        assertTrue(foundBob);
 
         tx.commit();
     }
 
-    private static void createStudentData(SimpleDB simpleDB, Transaction tx) throws BufferAbortException, LockAbortException {
+    private void createStudentData(SimpleDB simpleDB, Transaction tx) {
         // Create student table schema
         Schema studentSchema = new Schema();
         studentSchema.addIntField("sid");
@@ -85,6 +118,15 @@ public class PlannerTest {
         ts.setInt("majorid", 20);
 
         ts.close();
-        System.out.println("Inserted 5 students into the database.\n");
+    }
+
+    private static class StudentRecord {
+        final String sname;
+        final int gradyear;
+
+        StudentRecord(String sname, int gradyear) {
+            this.sname = sname;
+            this.gradyear = gradyear;
+        }
     }
 }

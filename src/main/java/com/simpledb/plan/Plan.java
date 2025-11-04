@@ -1,12 +1,10 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Scan;
 
 public interface Plan {
-    public Scan open() throws BufferAbortException, LockAbortException;
+    public Scan open();
 
     public int blocksAccessed();
 

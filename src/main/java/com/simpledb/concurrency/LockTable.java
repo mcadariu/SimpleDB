@@ -10,7 +10,7 @@ public class LockTable {
 
     private Map<BlockId, Integer> locks = new HashMap<>();
 
-    public synchronized void sLock(BlockId blockId) throws LockAbortException {
+    public synchronized void sLock(BlockId blockId) {
         try {
             long timestamp = System.currentTimeMillis();
             while (hasXlock(blockId) && !waitingTooLong(timestamp))
@@ -25,7 +25,7 @@ public class LockTable {
         }
     }
 
-    public synchronized void xLock(BlockId blockId) throws LockAbortException {
+    public synchronized void xLock(BlockId blockId) {
         try {
             long timestamp = System.currentTimeMillis();
             while (hasOtherSlocks(blockId) && !waitingTooLong(timestamp))

@@ -1,6 +1,5 @@
 package com.simpledb.scan;
 
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Schema;
 
 public class Expression {
@@ -27,7 +26,7 @@ public class Expression {
         return fldname;
     }
 
-    public Constant evaluate(Scan s) throws LockAbortException {
+    public Constant evaluate(Scan s) {
         return (val != null) ? val : s.getVal(fldname);
     }
 

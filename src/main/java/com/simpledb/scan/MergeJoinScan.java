@@ -1,15 +1,12 @@
 package com.simpledb.scan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
-
 public class MergeJoinScan implements Scan {
     private Scan s1;
     private SortScan s2;
     private String fldname1, fldname2;
     private Constant joinval = null;
 
-    public MergeJoinScan(Scan s1, SortScan s2, String fldname1, String fldname2) throws BufferAbortException, LockAbortException {
+    public MergeJoinScan(Scan s1, SortScan s2, String fldname1, String fldname2) {
         this.s1 = s1;
         this.s2 = s2;
         this.fldname1 = fldname1;
@@ -18,13 +15,13 @@ public class MergeJoinScan implements Scan {
     }
 
     @Override
-    public void beforeFirst() throws BufferAbortException, LockAbortException {
+    public void beforeFirst() {
         s1.beforeFirst();
         s2.beforeFirst();
     }
 
     @Override
-    public boolean next() throws LockAbortException, BufferAbortException {
+    public boolean next() {
         boolean hasmore2 = s2.next();
         if (hasmore2 && s2.getVal(fldname2).equals(joinval))
             return true;
@@ -53,7 +50,7 @@ public class MergeJoinScan implements Scan {
     }
 
     @Override
-    public int getInt(String fldname) throws LockAbortException {
+    public int getInt(String fldname) {
         if (s1.hasField(fldname))
             return s1.getInt(fldname);
         else
@@ -61,7 +58,7 @@ public class MergeJoinScan implements Scan {
     }
 
     @Override
-    public String getString(String fldname) throws LockAbortException {
+    public String getString(String fldname) {
         if (s1.hasField(fldname))
             return s1.getString(fldname);
         else
@@ -69,7 +66,7 @@ public class MergeJoinScan implements Scan {
     }
 
     @Override
-    public Constant getVal(String fldname) throws LockAbortException {
+    public Constant getVal(String fldname) {
         if (s1.hasField(fldname))
             return s1.getVal(fldname);
         else

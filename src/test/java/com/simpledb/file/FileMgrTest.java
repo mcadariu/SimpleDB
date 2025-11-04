@@ -2,13 +2,30 @@ package com.simpledb.file;
 
 import java.io.File;
 
+import static org.junit.Assert.*;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
+
 public class FileMgrTest {
+    private File tempDir;
+    private FileMgr fileMgr;
 
-    public static void main(String [] args) {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
+    @Before
+    public void setUp() {
+        tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
+        fileMgr = new FileMgr(tempDir, 400);
+    }
 
-        FileMgr fileMgr = new FileMgr(tempDir, 400);
+    @After
+    public void tearDown() {
+        if (tempDir != null && tempDir.exists()) {
+            deleteDirectory(tempDir);
+        }
+    }
 
+    @Test
+    public void testReadAndWriteBlock() {
         BlockId blk = new BlockId("yolo", 2);
         Page p1 = new Page(fileMgr.blockSize(), fileMgr.arena());
         int pos1 = 88;
@@ -22,8 +39,21 @@ public class FileMgrTest {
         Page p2 = new Page(fileMgr.blockSize(), fileMgr.arena());
         fileMgr.read(blk, p2);
 
-        System.out.println("offset " + pos1 + "contains" + p2.getString(pos1));
-        System.out.println("offset " + pos2 + "contains" + p2.getInt(pos2));
+        assertEquals("abcyolo", p2.getString(pos1));
+        assertEquals(69, p2.getInt(pos2));
     }
 
+    private void deleteDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        directory.delete();
+    }
 }

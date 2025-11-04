@@ -1,7 +1,5 @@
 package com.simpledb.index;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Layout;
 import com.simpledb.scan.Constant;
 import com.simpledb.scan.RID;
@@ -23,7 +21,7 @@ public class HashIndex implements Index {
     }
 
     @Override
-    public void beforeFirst(Constant searchKey) throws BufferAbortException, LockAbortException {
+    public void beforeFirst(Constant searchKey) {
         close();
         this.searchkey = searchKey;
         int bucket = searchKey.hashCode() % NUM_BUCKERS;
@@ -32,7 +30,7 @@ public class HashIndex implements Index {
     }
 
     @Override
-    public boolean next() throws BufferAbortException, LockAbortException {
+    public boolean next() {
         while (tableScan.next()) {
             if (tableScan.getVal("dataval").equals(searchkey))
                 return true;
@@ -41,14 +39,14 @@ public class HashIndex implements Index {
     }
 
     @Override
-    public RID getDataRid() throws LockAbortException {
+    public RID getDataRid() {
         int blknum = tableScan.getInt("block");
         int id = tableScan.getInt("id");
         return new RID(blknum, id);
     }
 
     @Override
-    public void insert(Constant dataVal, RID dataRid) throws BufferAbortException, LockAbortException {
+    public void insert(Constant dataVal, RID dataRid) {
         beforeFirst(dataVal);
         tableScan.insert();
         tableScan.setInt("block", dataRid.blockNumber());
@@ -57,7 +55,7 @@ public class HashIndex implements Index {
     }
 
     @Override
-    public void delete(Constant dataval, RID datarid) throws BufferAbortException, LockAbortException {
+    public void delete(Constant dataval, RID datarid) {
         beforeFirst(dataval);
         while (next()) {
             if (getDataRid().equals(datarid)) {

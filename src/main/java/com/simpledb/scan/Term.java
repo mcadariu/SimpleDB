@@ -1,6 +1,5 @@
 package com.simpledb.scan;
 
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.plan.Plan;
 import com.simpledb.record.Schema;
 
@@ -12,7 +11,7 @@ public class Term {
         this.rhs = rhs;
     }
 
-    public boolean isSatisfied(Scan s) throws LockAbortException {
+    public boolean isSatisfied(Scan s) {
         Constant lhsval = lhs.evaluate(s);
         Constant rhsval = rhs.evaluate(s);
         return rhsval.equals(lhsval);

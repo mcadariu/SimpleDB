@@ -1,4 +1,4 @@
 package com.simpledb.parse;
 
-public class BadSyntaxException extends Throwable {
+public class BadSyntaxException extends RuntimeException {
 }

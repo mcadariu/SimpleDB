@@ -1,7 +1,5 @@
 package com.simpledb.metadata;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.TableScan;
@@ -14,7 +12,7 @@ public class TableMgr {
     public static final int MAX_NAME = 16; // table of field name
     private Layout tcatLayout, fcatLayout;
 
-    public TableMgr(boolean isNew, Transaction tx) throws BufferAbortException, LockAbortException {
+    public TableMgr(boolean isNew, Transaction tx) {
         Schema tcatSchema = new Schema();
         tcatSchema.addStringField("tblname", MAX_NAME);
         tcatSchema.addIntField("slotsize");
@@ -35,7 +33,7 @@ public class TableMgr {
 
     }
 
-    public void createTable(String tblname, Schema sch, Transaction tx) throws BufferAbortException, LockAbortException {
+    public void createTable(String tblname, Schema sch, Transaction tx) {
         Layout layout = new Layout(sch);
 
         TableScan tcat = new TableScan(tx, "tblcat", tcatLayout);
@@ -56,7 +54,7 @@ public class TableMgr {
         fcat.close();
     }
 
-    public Layout getLayout(String tblname, Transaction tx) throws BufferAbortException, LockAbortException {
+    public Layout getLayout(String tblname, Transaction tx) {
         int size = -1;
         TableScan tcat = new TableScan(tx, "tblcat", tcatLayout);
         while (tcat.next()) {

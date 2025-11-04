@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.TempTable;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
@@ -18,7 +16,7 @@ public class MaterializePlan implements Plan {
         this.tx = tx;
     }
 
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         Schema schema = srcPlan.schema();
         TempTable tempTable = new TempTable(tx, schema);
         Scan src = srcPlan.open();

@@ -1,7 +1,5 @@
 package com.simpledb.metadata;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Layout;
 import com.simpledb.scan.TableScan;
 import com.simpledb.transaction.Transaction;
@@ -14,12 +12,12 @@ public class StatMgr {
     private Map<String, StatInfo> tablestats;
     private int numcalls;
 
-    public StatMgr(TableMgr tableMgr, Transaction tx) throws BufferAbortException, LockAbortException {
+    public StatMgr(TableMgr tableMgr, Transaction tx) {
         this.tableMgr = tableMgr;
         refreshStatistics(tx);
     }
 
-    public synchronized StatInfo getStatInfo(String tblname, Layout layout, Transaction tx) throws BufferAbortException, LockAbortException {
+    public synchronized StatInfo getStatInfo(String tblname, Layout layout, Transaction tx) {
         numcalls++;
 
         if (numcalls > 100)
@@ -33,7 +31,7 @@ public class StatMgr {
         return si;
     }
 
-    private StatInfo calcTableStats(String tblname, Layout layout, Transaction tx) throws BufferAbortException, LockAbortException {
+    private StatInfo calcTableStats(String tblname, Layout layout, Transaction tx) {
         int numrecs = 0;
         int numblocks = 0;
 
@@ -46,7 +44,7 @@ public class StatMgr {
         return new StatInfo(numblocks, numrecs);
     }
 
-    private void refreshStatistics(Transaction tx) throws BufferAbortException, LockAbortException {
+    private void refreshStatistics(Transaction tx) {
         tablestats = new HashMap<>();
         numcalls = 0;
         Layout tcatLayout = tableMgr.getLayout("tblcat", tx);

@@ -1,7 +1,5 @@
 package com.simpledb.scan;
 
-import com.simpledb.concurrency.LockAbortException;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -9,7 +7,7 @@ import java.util.Map;
 public class GroupValue {
     private Map<String, Constant> vals = new HashMap<>();
 
-    public GroupValue(Scan s, List<String> groupByFields) throws LockAbortException {
+    public GroupValue(Scan s, List<String> groupByFields) {
         for (String fldname : groupByFields)
             vals.put(fldname, s.getVal(fldname));
     }

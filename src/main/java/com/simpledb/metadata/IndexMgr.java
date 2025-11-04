@@ -1,7 +1,5 @@
 package com.simpledb.metadata;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.TableScan;
@@ -17,7 +15,7 @@ public class IndexMgr {
     private TableMgr tableMgr;
     private StatMgr statMgr;
 
-    public IndexMgr(boolean isnew, TableMgr tableMgr, StatMgr statMgr, Transaction tx) throws BufferAbortException, LockAbortException {
+    public IndexMgr(boolean isnew, TableMgr tableMgr, StatMgr statMgr, Transaction tx) {
         if (isnew) {
             Schema schema = new Schema();
             schema.addStringField("indexname", MAX_NAME);
@@ -31,7 +29,7 @@ public class IndexMgr {
         layout = tableMgr.getLayout("idxcat", tx);
     }
 
-    public void createIndex(String idxname, String tblname, String fldname, Transaction tx) throws BufferAbortException, LockAbortException {
+    public void createIndex(String idxname, String tblname, String fldname, Transaction tx) {
         TableScan tableScan = new TableScan(tx, "idxcat", layout);
         tableScan.insert();
 
@@ -41,7 +39,7 @@ public class IndexMgr {
         tableScan.close();
     }
 
-    public Map<String, IndexInfo> getIndexInfo(String tblname, Transaction tx) throws BufferAbortException, LockAbortException {
+    public Map<String, IndexInfo> getIndexInfo(String tblname, Transaction tx) {
         Map<String, IndexInfo> result = new HashMap<>();
         TableScan tableScan = new TableScan(tx, "idxcat", layout);
 

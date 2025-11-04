@@ -1,8 +1,6 @@
 package com.simpledb;
 
-import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.buffer.BufferMgr;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.FileMgr;
 import com.simpledb.log.LogMgr;
 import com.simpledb.metadata.MetadataMgr;
@@ -18,7 +16,7 @@ public class SimpleDB {
     private BufferMgr bufferMgr;
     private MetadataMgr metadataMgr;
 
-    public SimpleDB(int blocksize, int buffsize) throws BufferAbortException, LockAbortException {
+    public SimpleDB(int blocksize, int buffsize) {
         File tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
 
         this.fileMgr = new FileMgr(tempDir, blocksize);

@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.index.Index;
 import com.simpledb.metadata.IndexInfo;
 import com.simpledb.record.Schema;
@@ -21,7 +19,7 @@ public class IndexSelectPlan implements Plan {
         this.val = val;
     }
 
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         TableScan ts = (TableScan) p.open();
         Index idx = ii.open();
         return new IndexSelectScan(idx, val, ts);

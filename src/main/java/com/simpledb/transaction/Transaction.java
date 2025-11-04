@@ -1,11 +1,9 @@
 package com.simpledb.transaction;
 
 import com.simpledb.buffer.Buffer;
-import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.buffer.BufferList;
 import com.simpledb.buffer.BufferMgr;
 import com.simpledb.concurrency.ConcurrencyMgr;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.BlockId;
 import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
@@ -39,19 +37,19 @@ public class Transaction {
         System.out.println("transaction " + txnum + " committed");
     }
 
-    public void rollback() throws BufferAbortException, LockAbortException {
+    public void rollback() {
         recoveryMgr.rollback();
         concurrencyMgr.release();
         myBuffers.unpinAll();
         System.out.println("transaction " + txnum + " rollbacked");
     }
 
-    public void recover() throws BufferAbortException, LockAbortException {
+    public void recover() {
         bufferMgr.flushAll(txnum);
         recoveryMgr.recover();
     }
 
-    public void pin(BlockId blockId) throws BufferAbortException {
+    public void pin(BlockId blockId) {
         myBuffers.pin(blockId);
     }
 
@@ -59,19 +57,19 @@ public class Transaction {
         myBuffers.unpin(blockId);
     }
 
-    public int getInt(BlockId blockId, int offset) throws LockAbortException {
+    public int getInt(BlockId blockId, int offset) {
         concurrencyMgr.sLock(blockId);
         Buffer buff = myBuffers.getBuffer(blockId);
         return buff.contents().getInt(offset);
     }
 
-    public String getString(BlockId blockId, int offset) throws LockAbortException {
+    public String getString(BlockId blockId, int offset) {
         concurrencyMgr.sLock(blockId);
         Buffer buff = myBuffers.getBuffer(blockId);
         return buff.contents().getString(offset);
     }
 
-    public void setInt(BlockId blockId, int offset, int val, boolean okToLong) throws LockAbortException {
+    public void setInt(BlockId blockId, int offset, int val, boolean okToLong) {
         concurrencyMgr.xLock(blockId);
         Buffer buff = myBuffers.getBuffer(blockId);
         int lsn = -1;
@@ -84,7 +82,7 @@ public class Transaction {
         buff.setModified(txnum, lsn);
     }
 
-    public void setString(BlockId blockId, int offset, String val, boolean okToLog) throws LockAbortException {
+    public void setString(BlockId blockId, int offset, String val, boolean okToLog) {
         concurrencyMgr.xLock(blockId);
 
         Buffer buff = myBuffers.getBuffer(blockId);
@@ -98,13 +96,13 @@ public class Transaction {
         buff.setModified(txnum, lsn);
     }
 
-    public int size(String filename) throws LockAbortException {
+    public int size(String filename) {
         BlockId dummyblk = new BlockId(filename, END_OF_FILE);
         concurrencyMgr.sLock(dummyblk);
         return fileMgr.length(filename);
     }
 
-    public BlockId append(String filename) throws LockAbortException {
+    public BlockId append(String filename) {
         BlockId dummyblk = new BlockId(filename, END_OF_FILE);
         concurrencyMgr.xLock(dummyblk);
         return fileMgr.append(filename);

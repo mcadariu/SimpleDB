@@ -10,7 +10,7 @@ public class Lexer {
     private Collection<String> keywords;
     private StreamTokenizer tok;
 
-    public Lexer(String s) throws BadSyntaxException {
+    public Lexer(String s) {
         initKeywords();
         tok = new StreamTokenizer(new StringReader(s));
         tok.ordinaryChar('.');
@@ -39,13 +39,13 @@ public class Lexer {
         return tok.ttype == StreamTokenizer.TT_WORD && !keywords.contains(tok.sval);
     }
 
-    public void eatDelim(char d) throws BadSyntaxException {
+    public void eatDelim(char d) {
         if (!matchDelim(d))
             throw new BadSyntaxException();
         nextToken();
     }
 
-    public int eatIntConstant() throws BadSyntaxException {
+    public int eatIntConstant() {
         if (!matchIntConstant())
             throw new BadSyntaxException();
         int i = (int) tok.nval;
@@ -53,7 +53,7 @@ public class Lexer {
         return i;
     }
 
-    public String eatStringConstant() throws BadSyntaxException {
+    public String eatStringConstant() {
         if (!matchStringConstant())
             throw new BadSyntaxException();
         String s = tok.sval;
@@ -61,13 +61,13 @@ public class Lexer {
         return s;
     }
 
-    public void eatKeyword(String w) throws BadSyntaxException {
+    public void eatKeyword(String w) {
         if (!matchKeyword(w))
             throw new BadSyntaxException();
         nextToken();
     }
 
-    public String eatId() throws BadSyntaxException {
+    public String eatId() {
         if (!matchId())
             throw new BadSyntaxException();
 
@@ -76,7 +76,7 @@ public class Lexer {
         return s;
     }
 
-    private void nextToken() throws BadSyntaxException {
+    private void nextToken() {
         try {
             tok.nextToken();
         } catch (IOException exception) {

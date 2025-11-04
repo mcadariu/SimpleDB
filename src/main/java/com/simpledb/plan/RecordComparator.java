@@ -1,6 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.scan.Constant;
 import com.simpledb.scan.Scan;
 
@@ -14,7 +13,7 @@ public class RecordComparator {
         this.fields = fields;
     }
 
-    public int compare(Scan src1, Scan src2) throws LockAbortException {
+    public int compare(Scan src1, Scan src2) {
         for(String fldname: fields) {
             Constant val1 = src1.getVal(fldname);
             Constant val2 = src2.getVal(fldname);

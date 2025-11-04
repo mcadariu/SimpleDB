@@ -1,7 +1,5 @@
 package com.simpledb.optimise;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.MetadataMgr;
 import com.simpledb.parse.QueryData;
 import com.simpledb.plan.Plan;
@@ -19,7 +17,7 @@ public class HeuristicQueryPlanner {
         this.metadataMgr = metadataMgr;
     }
 
-    public Plan createPlan(QueryData queryData, Transaction tx) throws BufferAbortException, LockAbortException {
+    public Plan createPlan(QueryData queryData, Transaction tx) {
 
         for (String tblname : queryData.tables()) {
             TablePlanner tp = new TablePlanner(tblname, queryData.pred(), tx, metadataMgr);

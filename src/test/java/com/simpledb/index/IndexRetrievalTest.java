@@ -1,8 +1,6 @@
 package com.simpledb.index;
 
 import com.simpledb.SimpleDB;
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.IndexInfo;
 import com.simpledb.metadata.MetadataMgr;
 import com.simpledb.plan.Plan;
@@ -13,15 +11,27 @@ import com.simpledb.scan.IntConstant;
 import com.simpledb.scan.RID;
 import com.simpledb.scan.UpdateScan;
 import com.simpledb.transaction.Transaction;
+import org.junit.Before;
+import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class IndexRetrievalTest {
-    public static void main(String[] args) throws BufferAbortException, LockAbortException {
-        SimpleDB simpleDB = new SimpleDB(400, 8);
-        Transaction tx = simpleDB.newTransaction();
+import static org.junit.Assert.*;
 
+public class IndexRetrievalTest {
+    private SimpleDB simpleDB;
+
+    @Before
+    public void setUp() {
+        simpleDB = new SimpleDB(400, 8);
+    }
+
+    @Test
+    public void testIndexRetrieval() {
+        Transaction tx = simpleDB.newTransaction();
         MetadataMgr metadataMgr = simpleDB.metadataMgr();
 
         // Create student table schema
@@ -39,7 +49,6 @@ public class IndexRetrievalTest {
         metadataMgr.createIndex("majoridindex", "student", "majorid", tx);
 
         Plan studentPlan = new TablePlan(tx, "student", metadataMgr);
-
         UpdateScan studentScan = (UpdateScan) studentPlan.open();
 
         Map<String, Index> indexes = new HashMap<>();
@@ -78,17 +87,26 @@ public class IndexRetrievalTest {
             idx.insert(dataVal, samDatarid);
         }
 
+        // Test retrieval using index
         Index idx = indexes.get("majorid");
+        assertNotNull(idx);
 
+        List<String> names = new ArrayList<>();
         idx.beforeFirst(new IntConstant(30));
         while (idx.next()) {
             RID datarid = idx.getDataRid();
             studentScan.moveToRid(datarid);
-            System.out.println(studentScan.getString("sname"));
+            names.add(studentScan.getString("sname"));
         }
 
+        // Verify we found sam
+        assertEquals(1, names.size());
+        assertTrue(names.contains("sam"));
+
         studentScan.close();
-        idx.close();
+        for (Index index : indexes.values()) {
+            index.close();
+        }
         tx.commit();
     }
 }

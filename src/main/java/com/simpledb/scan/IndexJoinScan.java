@@ -1,7 +1,5 @@
 package com.simpledb.scan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.index.Index;
 
 public class IndexJoinScan implements Scan {
@@ -10,7 +8,7 @@ public class IndexJoinScan implements Scan {
     private String joinField;
     private TableScan rhs;
 
-    public IndexJoinScan(Scan s, Index idx, String joinField, TableScan ts) throws BufferAbortException, LockAbortException {
+    public IndexJoinScan(Scan s, Index idx, String joinField, TableScan ts) {
         this.lhs = s;
         this.idx = idx;
         this.joinField = joinField;
@@ -19,14 +17,14 @@ public class IndexJoinScan implements Scan {
     }
 
     @Override
-    public void beforeFirst() throws BufferAbortException, LockAbortException {
+    public void beforeFirst() {
         lhs.beforeFirst();
         lhs.next();
         resetIndex();
     }
 
     @Override
-    public boolean next() throws LockAbortException, BufferAbortException {
+    public boolean next() {
         while (true) {
             if (idx.next()) {
                 rhs.moveToRid(idx.getDataRid());
@@ -39,7 +37,7 @@ public class IndexJoinScan implements Scan {
     }
 
     @Override
-    public int getInt(String fldname) throws LockAbortException {
+    public int getInt(String fldname) {
         if (rhs.hasField(fldname))
             return rhs.getInt(fldname);
         else
@@ -47,7 +45,7 @@ public class IndexJoinScan implements Scan {
     }
 
     @Override
-    public String getString(String fldname) throws LockAbortException {
+    public String getString(String fldname) {
         if (rhs.hasField(fldname))
             return rhs.getString(fldname);
         else
@@ -55,7 +53,7 @@ public class IndexJoinScan implements Scan {
     }
 
     @Override
-    public Constant getVal(String fldname) throws LockAbortException {
+    public Constant getVal(String fldname) {
         if (rhs.hasField(fldname))
             return rhs.getVal(fldname);
         else
@@ -74,7 +72,7 @@ public class IndexJoinScan implements Scan {
         rhs.close();
     }
 
-    private void resetIndex() throws LockAbortException, BufferAbortException {
+    private void resetIndex() {
         Constant searchkey = lhs.getVal(joinField);
         idx.beforeFirst(searchkey);
     }

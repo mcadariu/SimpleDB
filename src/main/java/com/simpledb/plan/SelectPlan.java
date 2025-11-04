@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Predicate;
 import com.simpledb.scan.Scan;
@@ -17,7 +15,7 @@ public class SelectPlan implements Plan {
     }
 
     @Override
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         Scan s = p.open();
         return new SelectScan(s, pred);
     }

@@ -1,8 +1,6 @@
 package com.simpledb.index;
 
 import com.simpledb.SimpleDB;
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.IndexInfo;
 import com.simpledb.metadata.MetadataMgr;
 import com.simpledb.plan.Plan;
@@ -12,15 +10,27 @@ import com.simpledb.scan.Constant;
 import com.simpledb.scan.RID;
 import com.simpledb.scan.UpdateScan;
 import com.simpledb.transaction.Transaction;
+import org.junit.Before;
+import org.junit.Test;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
-public class IndexUpdateTest {
-    public static void main(String[] args) throws BufferAbortException, LockAbortException {
-        SimpleDB simpleDB = new SimpleDB(400, 8);
-        Transaction tx = simpleDB.newTransaction();
+import static org.junit.Assert.*;
 
+public class IndexUpdateTest {
+    private SimpleDB simpleDB;
+
+    @Before
+    public void setUp() {
+        simpleDB = new SimpleDB(400, 8);
+    }
+
+    @Test
+    public void testIndexUpdate() {
+        Transaction tx = simpleDB.newTransaction();
         MetadataMgr metadataMgr = simpleDB.metadataMgr();
 
         // Create student table schema
@@ -38,7 +48,6 @@ public class IndexUpdateTest {
         metadataMgr.createIndex("majoridindex", "student", "majorid", tx);
 
         Plan studentPlan = new TablePlan(tx, "student", metadataMgr);
-
         UpdateScan studentScan = (UpdateScan) studentPlan.open();
 
         Map<String, Index> indexes = new HashMap<>();
@@ -79,31 +88,36 @@ public class IndexUpdateTest {
 
         studentScan.beforeFirst();
 
-        System.out.println("\nSearching for joe to delete...");
+        // Delete joe
+        boolean foundJoe = false;
         while (studentScan.next()) {
             if (studentScan.getString("sname").equals("joe")) {
-                System.out.println("Found joe with sid=" + studentScan.getInt("sid") + ", deleting...");
+                foundJoe = true;
+                assertEquals(10, studentScan.getInt("sid"));
                 RID joeRid = studentScan.getRid();
                 for (String fldname : indexes.keySet()) {
                     Constant dataVal = studentScan.getVal(fldname);
                     Index idx = indexes.get(fldname);
                     idx.delete(dataVal, joeRid);
                 }
-
                 studentScan.delete();
                 break;
             }
         }
+        assertTrue("Should have found joe", foundJoe);
 
-        System.out.println("\nRemaining students:");
+        // Verify remaining students
         studentScan.beforeFirst();
-
+        List<String> remainingStudents = new ArrayList<>();
         while (studentScan.next()) {
-            System.out.println(studentScan.getString("sname") + " " + studentScan.getInt("sid"));
+            remainingStudents.add(studentScan.getString("sname"));
         }
 
-        studentScan.close();
+        assertEquals(1, remainingStudents.size());
+        assertTrue(remainingStudents.contains("sam"));
+        assertFalse(remainingStudents.contains("joe"));
 
+        studentScan.close();
         for (Index idx : indexes.values()) {
             idx.close();
         }

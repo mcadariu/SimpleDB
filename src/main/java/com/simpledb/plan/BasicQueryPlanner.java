@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.MetadataMgr;
 import com.simpledb.parse.QueryData;
 import com.simpledb.transaction.Transaction;
@@ -16,7 +14,7 @@ public class BasicQueryPlanner {
         this.metadataMgr = metadataMgr;
     }
 
-    public Plan createPlan(QueryData queryData, Transaction tx) throws BufferAbortException, LockAbortException {
+    public Plan createPlan(QueryData queryData, Transaction tx) {
         List<Plan> plans = new ArrayList<>();
 
         for (String tblname : queryData.tables()) {

@@ -3,35 +3,35 @@ package com.simpledb.parse;
 public class PredParser {
     private Lexer lex;
 
-    public PredParser(String s) throws BadSyntaxException {
+    public PredParser(String s) {
         lex = new Lexer(s);
     }
 
-    public void field() throws BadSyntaxException {
+    public void field() {
         lex.eatId();
     }
 
-    public void constant() throws BadSyntaxException {
+    public void constant() {
         if (lex.matchStringConstant())
             lex.eatStringConstant();
         else
             lex.eatIntConstant();
     }
 
-    public void expression() throws BadSyntaxException {
+    public void expression() {
         if (lex.matchId())
             field();
         else
             constant();
     }
 
-    public void term() throws BadSyntaxException {
+    public void term() {
         expression();
         lex.eatDelim('=');
         expression();
     }
 
-    public void predicate() throws BadSyntaxException {
+    public void predicate() {
         term();
         if (lex.matchKeyword("and")) {
             lex.eatKeyword("and");

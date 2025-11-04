@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.MergeJoinScan;
 import com.simpledb.scan.Scan;
@@ -29,7 +27,7 @@ public class MergeJoinPlan implements Plan {
         schema.addAll(p2.schema());
     }
 
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         Scan s1 = p1.open();
         SortScan s2 = (SortScan) p2.open();
         return new MergeJoinScan(s1, s2, fldname1, fldname2);

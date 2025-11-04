@@ -9,14 +9,14 @@ public class ConcurrencyMgr {
     private static LockTable lockTable = new LockTable();
     private Map<BlockId, String> locks = new HashMap<>();
 
-    public void sLock(BlockId blockId) throws LockAbortException {
+    public void sLock(BlockId blockId) {
         if(locks.get(blockId) == null) {
             lockTable.sLock(blockId);
             locks.put(blockId, "S");
         }
     }
 
-    public void xLock(BlockId blockId) throws LockAbortException {
+    public void xLock(BlockId blockId) {
         if(!hasXLock(blockId)) {
             sLock(blockId);
             lockTable.xLock(blockId);

@@ -1,7 +1,5 @@
 package com.simpledb.optimise;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.IndexInfo;
 import com.simpledb.metadata.MetadataMgr;
 import com.simpledb.plan.*;
@@ -19,7 +17,7 @@ public class TablePlanner {
     private Map<String, IndexInfo> indexes;
     private Transaction tx;
 
-    public TablePlanner(String tblname, Predicate pred, Transaction tx, MetadataMgr metadataMgr) throws BufferAbortException, LockAbortException {
+    public TablePlanner(String tblname, Predicate pred, Transaction tx, MetadataMgr metadataMgr) {
         this.mypred = pred;
         this.tx = tx;
         myplan = new TablePlan(tx, tblname, metadataMgr);

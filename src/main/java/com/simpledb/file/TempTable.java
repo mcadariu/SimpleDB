@@ -1,7 +1,5 @@
 package com.simpledb.file;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Layout;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.TableScan;
@@ -20,7 +18,7 @@ public class TempTable {
         layout = new Layout(sch);
     }
 
-    public UpdateScan open() throws BufferAbortException, LockAbortException {
+    public UpdateScan open() {
         return new TableScan(tx, tblname, layout);
     }
 

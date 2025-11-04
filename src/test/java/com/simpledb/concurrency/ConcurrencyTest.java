@@ -6,29 +6,65 @@ import com.simpledb.file.BlockId;
 import com.simpledb.file.FileMgr;
 import com.simpledb.log.LogMgr;
 import com.simpledb.transaction.Transaction;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.Test;
 
 import java.io.File;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import static org.junit.Assert.assertTrue;
 
 public class ConcurrencyTest {
-    private static FileMgr fileMgr;
-    private static LogMgr logMgr;
-    private static BufferMgr bufferMgr;
+    private FileMgr fileMgr;
+    private LogMgr logMgr;
+    private BufferMgr bufferMgr;
+    private File tempDir;
 
-    public static void main(String[] args) {
-        File tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
+    @Before
+    public void setUp() {
+        tempDir = new File(System.getProperty("java.io.tmpdir"), "simpledb_test_" + System.currentTimeMillis());
         fileMgr = new FileMgr(tempDir, 400);
         logMgr = new LogMgr(fileMgr, "logtest");
         bufferMgr = new BufferMgr(fileMgr, logMgr, 3);
-
-        A a = new A();
-        new Thread(a).start();
-        B b = new B();
-        new Thread(b).start();
-        C c = new C();
-        new Thread(c).start();
     }
 
-    static class A implements Runnable {
+    @After
+    public void tearDown() {
+        if (tempDir != null && tempDir.exists()) {
+            deleteDirectory(tempDir);
+        }
+    }
+
+    @Test
+    public void testConcurrentTransactions() throws InterruptedException {
+        CountDownLatch latch = new CountDownLatch(3);
+        AtomicBoolean success = new AtomicBoolean(true);
+
+        Thread threadA = new Thread(new TransactionA(latch, success));
+        Thread threadB = new Thread(new TransactionB(latch, success));
+        Thread threadC = new Thread(new TransactionC(latch, success));
+
+        threadA.start();
+        threadB.start();
+        threadC.start();
+
+        // Wait for all threads to complete (with timeout)
+        latch.await();
+
+        assertTrue("All transactions should complete successfully", success.get());
+    }
+
+    class TransactionA implements Runnable {
+        private final CountDownLatch latch;
+        private final AtomicBoolean success;
+
+        TransactionA(CountDownLatch latch, AtomicBoolean success) {
+            this.latch = latch;
+            this.success = success;
+        }
+
         public void run() {
             try {
                 Transaction txA = new Transaction(fileMgr, logMgr, bufferMgr);
@@ -38,21 +74,27 @@ public class ConcurrencyTest {
                 txA.pin(blockId1);
                 txA.pin(blockId2);
 
-                System.out.println("Tx A: request slock 1");
                 txA.getInt(blockId1, 0);
-                System.out.println("Tx A: receive slock 1");
                 Thread.sleep(1000);
-                System.out.println("Tx A: request slock 2");
                 txA.getString(blockId2, 0);
-                System.out.println("Tx A: receive slock 2");
                 txA.commit();
             } catch (InterruptedException | BufferAbortException | LockAbortException e) {
-
+                success.set(false);
+            } finally {
+                latch.countDown();
             }
         }
     }
 
-    static class B implements Runnable {
+    class TransactionB implements Runnable {
+        private final CountDownLatch latch;
+        private final AtomicBoolean success;
+
+        TransactionB(CountDownLatch latch, AtomicBoolean success) {
+            this.latch = latch;
+            this.success = success;
+        }
+
         public void run() {
             try {
                 Transaction txB = new Transaction(fileMgr, logMgr, bufferMgr);
@@ -62,21 +104,27 @@ public class ConcurrencyTest {
                 txB.pin(blockId1);
                 txB.pin(blockId2);
 
-                System.out.println("Tx B: request xlock 2");
                 txB.setInt(blockId2, 0, 0, false);
-                System.out.println("Tx B: receive xlock 2");
                 Thread.sleep(1000);
-                System.out.println("Tx B: request slock 1");
                 txB.getInt(blockId1, 0);
-                System.out.println("Tx B: receive slock 2");
                 txB.commit();
             } catch (InterruptedException | BufferAbortException | LockAbortException e) {
-
+                success.set(false);
+            } finally {
+                latch.countDown();
             }
         }
     }
 
-    static class C implements Runnable {
+    class TransactionC implements Runnable {
+        private final CountDownLatch latch;
+        private final AtomicBoolean success;
+
+        TransactionC(CountDownLatch latch, AtomicBoolean success) {
+            this.latch = latch;
+            this.success = success;
+        }
+
         public void run() {
             try {
                 Transaction txC = new Transaction(fileMgr, logMgr, bufferMgr);
@@ -86,19 +134,29 @@ public class ConcurrencyTest {
                 txC.pin(blockId1);
                 txC.pin(blockId2);
 
-                System.out.println("Tx C: request xlock 1");
                 txC.setInt(blockId1, 0, 0, false);
-                System.out.println("Tx C: receive xlock 1");
                 Thread.sleep(1000);
-                System.out.println("Tx C: request slock 2");
                 txC.getInt(blockId2, 0);
-                System.out.println("Tx C: receive slock 2");
                 txC.commit();
             } catch (InterruptedException | BufferAbortException | LockAbortException e) {
-
+                success.set(false);
+            } finally {
+                latch.countDown();
             }
         }
-//        }
+    }
 
+    private void deleteDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files != null) {
+            for (File file : files) {
+                if (file.isDirectory()) {
+                    deleteDirectory(file);
+                } else {
+                    file.delete();
+                }
+            }
+        }
+        directory.delete();
     }
 }

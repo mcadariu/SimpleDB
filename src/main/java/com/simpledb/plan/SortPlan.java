@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.TempTable;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.Scan;
@@ -27,7 +25,7 @@ public class SortPlan implements Plan {
     }
 
     @Override
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         Scan src = p.open();
         List<TempTable> runs = splitIntoRuns(src);
         src.close();
@@ -37,7 +35,7 @@ public class SortPlan implements Plan {
         return new SortScan(runs, comp);
     }
 
-    private List<TempTable> doAMergeIteration(List<TempTable> runs) throws BufferAbortException, LockAbortException {
+    private List<TempTable> doAMergeIteration(List<TempTable> runs) {
         List<TempTable> result = new ArrayList<>();
         while (runs.size() > 1) {
             TempTable p1 = runs.remove(0);
@@ -49,7 +47,7 @@ public class SortPlan implements Plan {
         return result;
     }
 
-    private TempTable mergeTwoRuns(TempTable p1, TempTable p2) throws BufferAbortException, LockAbortException {
+    private TempTable mergeTwoRuns(TempTable p1, TempTable p2) {
         Scan src1 = p1.open();
         Scan src2 = p2.open();
         TempTable result = new TempTable(tx, sch);
@@ -82,7 +80,7 @@ public class SortPlan implements Plan {
         return result;
     }
 
-    private List<TempTable> splitIntoRuns(Scan src) throws BufferAbortException, LockAbortException {
+    private List<TempTable> splitIntoRuns(Scan src) {
         List<TempTable> temps = new ArrayList<>();
         src.beforeFirst();
         if (!src.next())
@@ -103,7 +101,7 @@ public class SortPlan implements Plan {
         return temps;
     }
 
-    private boolean copy(Scan src, UpdateScan dest) throws BufferAbortException, LockAbortException {
+    private boolean copy(Scan src, UpdateScan dest) {
         dest.insert();
         for(String fldname: sch.fields())
             dest.setVal(fldname, src.getVal(fldname));

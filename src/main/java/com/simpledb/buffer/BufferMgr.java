@@ -36,7 +36,7 @@ public class BufferMgr {
         }
     }
 
-    public synchronized Buffer pin(BlockId blockId) throws BufferAbortException {
+    public synchronized Buffer pin(BlockId blockId) {
         try {
             long timestamp = System.currentTimeMillis();
             Buffer buffer = tryToPin(blockId);

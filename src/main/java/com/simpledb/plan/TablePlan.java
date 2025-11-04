@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.metadata.MetadataMgr;
 import com.simpledb.metadata.StatInfo;
 import com.simpledb.record.Layout;
@@ -17,7 +15,7 @@ public class TablePlan implements Plan {
     private Layout layout;
     private StatInfo si;
 
-    public TablePlan(Transaction tx, String tblname, MetadataMgr metadataMgr) throws BufferAbortException, LockAbortException {
+    public TablePlan(Transaction tx, String tblname, MetadataMgr metadataMgr) {
         this.tx = tx;
         this.tblname = tblname;
         layout = metadataMgr.getLayout(tblname, tx);
@@ -25,7 +23,7 @@ public class TablePlan implements Plan {
     }
 
     @Override
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         return new TableScan(tx, tblname, layout);
     }
 

@@ -20,7 +20,7 @@ public class BufferList {
         return buffers.get(blockId);
     }
 
-    public void pin(BlockId blockId) throws BufferAbortException {
+    public void pin(BlockId blockId) {
         Buffer buff = bufferMgr.pin(blockId);
         buffers.put(blockId, buff);
         pins.add(blockId);

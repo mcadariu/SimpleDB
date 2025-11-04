@@ -1,9 +1,7 @@
 package com.simpledb.recover;
 
 import com.simpledb.buffer.Buffer;
-import com.simpledb.buffer.BufferAbortException;
 import com.simpledb.buffer.BufferMgr;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.BlockId;
 import com.simpledb.file.FileMgr;
 import com.simpledb.log.*;
@@ -38,14 +36,14 @@ public class RecoveryMgr {
         logMgr.flush(lsn);
     }
 
-    public void rollback() throws BufferAbortException, LockAbortException {
+    public void rollback() {
         doRollback();
         bufferMgr.flushAll(txnum);
         int lsn = RollbackRecord.writeToLog(logMgr, txnum, fileMgr);
         logMgr.flush(lsn);
     }
 
-    public void recover() throws BufferAbortException, LockAbortException {
+    public void recover() {
         doRecover();
         bufferMgr.flushAll(txnum);
         int lsn = CheckpointRecord.writeToLog(logMgr, fileMgr);
@@ -64,7 +62,7 @@ public class RecoveryMgr {
         return SetStringRecord.writeToLog(logMgr, txnum, blk, offset, oldval, fileMgr);
     }
 
-    private void doRollback() throws BufferAbortException, LockAbortException {
+    private void doRollback() {
         Iterator<byte[]> iter = logMgr.iterator();
         while (iter.hasNext()) {
             byte[] bytes = iter.next();
@@ -78,7 +76,7 @@ public class RecoveryMgr {
         }
     }
 
-    private void doRecover() throws BufferAbortException, LockAbortException {
+    private void doRecover() {
         Collection<Integer> finishedTxs = new ArrayList<>();
         Iterator<byte[]> iter = logMgr.iterator();
         while (iter.hasNext()) {

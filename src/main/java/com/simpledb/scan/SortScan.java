@@ -1,7 +1,5 @@
 package com.simpledb.scan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.TempTable;
 import com.simpledb.plan.RecordComparator;
 
@@ -14,7 +12,7 @@ public class SortScan implements Scan {
     private boolean hasmore1, hasmore2 = false;
     private List<RID> savePosition;
 
-    public SortScan(List<TempTable> runs, RecordComparator comp) throws BufferAbortException, LockAbortException {
+    public SortScan(List<TempTable> runs, RecordComparator comp) {
         this.comp = comp;
         s1 = runs.get(0).open();
         hasmore1 = s1.next();
@@ -25,7 +23,7 @@ public class SortScan implements Scan {
     }
 
     @Override
-    public void beforeFirst() throws BufferAbortException, LockAbortException {
+    public void beforeFirst() {
         s1.beforeFirst();
         hasmore1 = s1.next();
         if (s2 != null) {
@@ -35,7 +33,7 @@ public class SortScan implements Scan {
     }
 
     @Override
-    public boolean next() throws LockAbortException, BufferAbortException {
+    public boolean next() {
         if (currentScan == s1)
             hasmore1 = s1.next();
         else if (currentScan == s2)
@@ -61,7 +59,7 @@ public class SortScan implements Scan {
         savePosition = Arrays.asList(rid1, rid2);
     }
 
-    public void restorePosition() throws BufferAbortException {
+    public void restorePosition() {
         RID rid1 = savePosition.get(0);
         RID rid2 = savePosition.get(1);
         s1.moveToRid(rid1);
@@ -69,17 +67,17 @@ public class SortScan implements Scan {
     }
 
     @Override
-    public int getInt(String fldname) throws LockAbortException {
+    public int getInt(String fldname) {
         return currentScan.getInt(fldname);
     }
 
     @Override
-    public String getString(String fldname) throws LockAbortException {
+    public String getString(String fldname) {
         return currentScan.getString(fldname);
     }
 
     @Override
-    public Constant getVal(String fldname) throws LockAbortException {
+    public Constant getVal(String fldname) {
         return currentScan.getVal(fldname);
     }
 

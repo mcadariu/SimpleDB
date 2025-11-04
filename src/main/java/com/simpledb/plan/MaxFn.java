@@ -1,6 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.scan.Constant;
 import com.simpledb.scan.Scan;
 
@@ -18,12 +17,12 @@ public class MaxFn implements AggregationFn {
     }
 
     @Override
-    public void processFirst(Scan s) throws LockAbortException {
+    public void processFirst(Scan s) {
         val = s.getVal(fldname);
     }
 
     @Override
-    public void processNext(Scan s) throws LockAbortException {
+    public void processNext(Scan s) {
         Constant newval = s.getVal(fldname);
         if (newval.compareTo(val) > 0)
             val = newval;

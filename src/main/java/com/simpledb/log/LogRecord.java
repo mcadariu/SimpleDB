@@ -1,7 +1,5 @@
 package com.simpledb.log;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
 import com.simpledb.transaction.Transaction;
@@ -13,7 +11,7 @@ public interface LogRecord {
 
     int txNumber();
 
-    void undo(Transaction tx) throws BufferAbortException, LockAbortException;
+    void undo(Transaction tx);
 
     static LogRecord createLogRecord(byte[] bytes, FileMgr fileMgr) {
         Page p = new Page(bytes, fileMgr.arena());

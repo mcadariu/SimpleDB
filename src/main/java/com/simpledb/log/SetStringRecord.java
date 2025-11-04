@@ -1,7 +1,5 @@
 package com.simpledb.log;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.file.BlockId;
 import com.simpledb.file.FileMgr;
 import com.simpledb.file.Page;
@@ -42,7 +40,7 @@ public class SetStringRecord implements LogRecord {
     }
 
     @Override
-    public void undo(Transaction tx) throws BufferAbortException, LockAbortException {
+    public void undo(Transaction tx) {
         tx.pin(blockId);
         tx.setString(blockId, offset, val, false);
         tx.unpin(blockId);

@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.record.Schema;
 import com.simpledb.scan.ProjectScan;
 import com.simpledb.scan.Scan;
@@ -18,7 +16,7 @@ public class ProjectPlan implements Plan {
             schema.add(fldname, p.schema());
     }
 
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         Scan s = p.open();
         return new ProjectScan(s, schema.fields());
     }

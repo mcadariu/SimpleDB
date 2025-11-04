@@ -15,36 +15,36 @@ import java.util.List;
 public class Parser {
     private Lexer lex;
 
-    public Parser(String s) throws BadSyntaxException {
+    public Parser(String s) {
         lex = new Lexer(s);
     }
 
-    public String field() throws BadSyntaxException {
+    public String field() {
         return lex.eatId();
     }
 
-    public Constant constant() throws BadSyntaxException {
+    public Constant constant() {
         if (lex.matchStringConstant())
             return new StringConstant(lex.eatStringConstant());
         else
             return new IntConstant(lex.eatIntConstant());
     }
 
-    public Expression expression() throws BadSyntaxException {
+    public Expression expression() {
         if (lex.matchId())
             return new Expression(field());
         else
             return new Expression(constant());
     }
 
-    public Term term() throws BadSyntaxException {
+    public Term term() {
         Expression lhs = expression();
         lex.eatDelim('=');
         Expression rhs = expression();
         return new Term(lhs, rhs);
     }
 
-    public Predicate predicate() throws BadSyntaxException {
+    public Predicate predicate() {
         Predicate pred = new Predicate(term());
 
         if (lex.matchKeyword("and")) {
@@ -54,7 +54,7 @@ public class Parser {
         return pred;
     }
 
-    public QueryData query() throws BadSyntaxException {
+    public QueryData query() {
         lex.eatKeyword("select");
         List<String> fields = selectList();
         lex.eatKeyword("from");
@@ -68,7 +68,7 @@ public class Parser {
         return new QueryData(fields, tables, pred);
     }
 
-    private List<String> selectList() throws BadSyntaxException {
+    private List<String> selectList() {
         List<String> L = new ArrayList<>();
         L.add(field());
         if (lex.matchDelim(',')) {
@@ -78,7 +78,7 @@ public class Parser {
         return L;
     }
 
-    private Collection<String> tableList() throws BadSyntaxException {
+    private Collection<String> tableList() {
         Collection<String> L = new ArrayList<String>();
         L.add(lex.eatId());
 
@@ -90,7 +90,7 @@ public class Parser {
         return L;
     }
 
-    public Object updateCmd() throws BadSyntaxException {
+    public Object updateCmd() {
         if (lex.matchKeyword("insert"))
             return insert();
         else if (lex.matchKeyword("delete"))
@@ -98,7 +98,7 @@ public class Parser {
         else return create();
     }
 
-    private DeleteData delete() throws BadSyntaxException {
+    private DeleteData delete() {
         lex.eatKeyword("delete");
         lex.eatKeyword("from");
         String tblname = lex.eatId();
@@ -112,7 +112,7 @@ public class Parser {
     }
 
 
-    private InsertData insert() throws BadSyntaxException {
+    private InsertData insert() {
         lex.eatKeyword("insert");
         lex.eatKeyword("into");
         String tblname = lex.eatId();
@@ -126,7 +126,7 @@ public class Parser {
         return new InsertData(tblname, flds, vals);
     }
 
-    private List<Constant> constList() throws BadSyntaxException {
+    private List<Constant> constList() {
         List<Constant> L = new ArrayList<>();
         L.add(constant());
         if (lex.matchDelim(',')) {
@@ -137,7 +137,7 @@ public class Parser {
         return L;
     }
 
-    public CreateTableData createTable() throws BadSyntaxException {
+    public CreateTableData createTable() {
         lex.eatKeyword("table");
         String tblname = lex.eatId();
         lex.eatDelim('(');
@@ -146,7 +146,7 @@ public class Parser {
         return new CreateTableData(tblname, sch);
     }
 
-    private Schema fieldDefs() throws BadSyntaxException {
+    private Schema fieldDefs() {
         Schema schema = fieldDef();
         if (lex.matchDelim(',')) {
             lex.eatDelim(',');
@@ -156,12 +156,12 @@ public class Parser {
         return schema;
     }
 
-    private Schema fieldDef() throws BadSyntaxException {
+    private Schema fieldDef() {
         String fldname = field();
         return fieldType(fldname);
     }
 
-    private Schema fieldType(String fldname) throws BadSyntaxException {
+    private Schema fieldType(String fldname) {
         Schema schema = new Schema();
         if (lex.matchKeyword("int")) {
             lex.eatKeyword("int");
@@ -176,7 +176,7 @@ public class Parser {
         return schema;
     }
 
-    private List<String> fieldList() throws BadSyntaxException {
+    private List<String> fieldList() {
         List<String> L = new ArrayList<>();
         L.add(field());
         if (lex.matchDelim(',')) {
@@ -186,7 +186,7 @@ public class Parser {
         return L;
     }
 
-    private Object create() throws BadSyntaxException {
+    private Object create() {
         lex.eatKeyword("create");
         if (lex.matchKeyword("table"))
             return createTable();
@@ -194,7 +194,7 @@ public class Parser {
             return createIndex();
     }
 
-    private CreateIndexData createIndex() throws BadSyntaxException {
+    private CreateIndexData createIndex() {
         lex.eatKeyword("index");
         String idxname = lex.eatId();
         lex.eatKeyword("on");

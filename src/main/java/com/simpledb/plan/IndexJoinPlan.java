@@ -1,7 +1,5 @@
 package com.simpledb.plan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
 import com.simpledb.index.Index;
 import com.simpledb.metadata.IndexInfo;
 import com.simpledb.record.Schema;
@@ -25,7 +23,7 @@ public class IndexJoinPlan implements Plan {
     }
 
     @Override
-    public Scan open() throws BufferAbortException, LockAbortException {
+    public Scan open() {
         Scan s = p1.open();
         TableScan ts = (TableScan) p2.open();
         Index idx = ii.open();

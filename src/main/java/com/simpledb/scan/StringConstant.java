@@ -13,6 +13,16 @@ public class StringConstant implements Constant {
     }
 
     @Override
+    public String asString() {
+        return val;
+    }
+
+    @Override
+    public int asInt() {
+        return Integer.parseInt(val);
+    }
+
+    @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;

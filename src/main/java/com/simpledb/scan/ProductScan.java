@@ -1,26 +1,23 @@
 package com.simpledb.scan;
 
-import com.simpledb.buffer.BufferAbortException;
-import com.simpledb.concurrency.LockAbortException;
-
 public class ProductScan implements Scan {
     private Scan s1, s2;
 
-    public ProductScan(Scan s1, Scan s2) throws BufferAbortException, LockAbortException {
+    public ProductScan(Scan s1, Scan s2) {
         this.s1 = s1;
         this.s2 = s2;
         s1.next();
     }
 
     @Override
-    public void beforeFirst() throws BufferAbortException, LockAbortException {
+    public void beforeFirst() {
         s1.beforeFirst();
         s1.next();
         s2.beforeFirst();
     }
 
     @Override
-    public boolean next() throws BufferAbortException, LockAbortException {
+    public boolean next() {
         if (s2.next())
             return true;
         else {
@@ -30,7 +27,7 @@ public class ProductScan implements Scan {
     }
 
     @Override
-    public int getInt(String fldname) throws LockAbortException {
+    public int getInt(String fldname) {
         if (s1.hasField(fldname))
             return s1.getInt(fldname);
         else
@@ -38,7 +35,7 @@ public class ProductScan implements Scan {
     }
 
     @Override
-    public String getString(String fldname) throws LockAbortException {
+    public String getString(String fldname) {
         if (s1.hasField(fldname))
             return s1.getString(fldname);
         else
@@ -46,7 +43,7 @@ public class ProductScan implements Scan {
     }
 
     @Override
-    public Constant getVal(String fldname) throws LockAbortException {
+    public Constant getVal(String fldname) {
         if (s1.hasField(fldname))
             return s1.getVal(fldname);
         else

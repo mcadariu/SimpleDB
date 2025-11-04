@@ -1,4 +1,4 @@
 package com.simpledb.buffer;
 
-public class BufferAbortException extends Throwable {
+public class BufferAbortException extends RuntimeException {
 }
