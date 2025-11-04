@@ -1,12 +1,6 @@
 package com.simpledb.scan;
 
-public class IntConstant implements Constant {
-    private Integer val;
-
-    public IntConstant(int val) {
-        this.val = val;
-    }
-
+public record IntConstant(int val) implements Constant {
     @Override
     public Object asJavaVal() {
         return val;
@@ -19,30 +13,17 @@ public class IntConstant implements Constant {
 
     @Override
     public String asString() {
-        return val.toString();
-    }
-
-    @Override
-    public boolean equals(Object obj) {
-        if (this == obj) return true;
-        if (obj == null || getClass() != obj.getClass()) return false;
-        IntConstant that = (IntConstant) obj;
-        return val.equals(that.val);
-    }
-
-    @Override
-    public int hashCode() {
-        return val.hashCode();
+        return Integer.toString(val);
     }
 
     @Override
     public String toString() {
-        return val.toString();
+        return Integer.toString(val);
     }
 
     @Override
     public int compareTo(Constant other) {
         IntConstant ic = (IntConstant) other;
-        return val.compareTo(ic.val);
+        return Integer.compare(val, ic.val);
     }
 }

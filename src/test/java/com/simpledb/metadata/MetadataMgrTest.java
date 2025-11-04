@@ -51,6 +51,8 @@ public class MetadataMgrTest {
             }
         }
         assertEquals(2, fieldCount);
+
+        tx.commit();
     }
 
     @Test
@@ -81,6 +83,8 @@ public class MetadataMgrTest {
         assertEquals(50, si.recordsOutput());
         assertTrue(si.distinctValues("A") > 0);
         assertTrue(si.distinctValues("B") > 0);
+
+        tx.commit();
     }
 
     @Test
@@ -126,5 +130,7 @@ public class MetadataMgrTest {
         assertTrue(iiB.blocksAccessed() >= 0);
         assertTrue(iiB.recordsOutput() >= 0);
         assertTrue(iiB.distinctValues("B") >= 0);
+
+        tx.commit();
     }
 }

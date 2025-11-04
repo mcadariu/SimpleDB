@@ -5,29 +5,8 @@ import com.simpledb.scan.Predicate;
 import java.util.Collection;
 import java.util.List;
 
-public class QueryData {
-    private List<String> fields;
-    private Collection<String> tables;
-    private Predicate pred;
-
-    public QueryData(List<String> fields, Collection<String> tables, Predicate pred) {
-        this.fields = fields;
-        this.tables = tables;
-        this.pred = pred;
-    }
-
-    public List<String> fields() {
-        return fields;
-    }
-
-    public Collection<String> tables() {
-        return tables;
-    }
-
-    public Predicate pred() {
-        return pred;
-    }
-
+public record QueryData(List<String> fields, Collection<String> tables, Predicate pred) {
+    @Override
     public String toString() {
         String result = "select ";
         for (String fldname : fields)

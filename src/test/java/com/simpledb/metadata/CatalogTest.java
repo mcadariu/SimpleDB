@@ -66,6 +66,8 @@ public class CatalogTest {
         assertTrue(tableNames.contains("tblcat"));
         assertTrue(tableNames.contains("fldcat"));
         assertTrue(tableNames.contains("MyTable"));
+
+        tx.commit();
     }
 
     @Test
@@ -109,6 +111,8 @@ public class CatalogTest {
         }
         assertTrue(foundA);
         assertTrue(foundB);
+
+        tx.commit();
     }
 
     private void deleteDirectory(File directory) {
